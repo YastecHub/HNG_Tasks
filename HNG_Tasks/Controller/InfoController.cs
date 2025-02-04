@@ -14,8 +14,8 @@ namespace HNG_Tasks.Controller
             var response = new
             {
                 email = "yasiroyebo@gmail.com",
-                currentDateTime = DateTime.UtcNow.ToString("o"),
-                githubUrl = "https://github.com/YastecHub/HNG_Tasks"
+                current_datetime = DateTime.UtcNow.ToString("o"),
+                github_url = "https://github.com/YastecHub/HNG_Tasks"
             };
             return Ok(response);
         }
