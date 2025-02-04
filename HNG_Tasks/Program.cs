@@ -2,11 +2,14 @@ using Microsoft.AspNetCore.Builder;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
 builder.Services.AddControllers()
       .AddJsonOptions(options =>
       {
           options.JsonSerializerOptions.WriteIndented = true;
       });
+
+builder.Services.AddHttpClient();
 
 builder.Services.AddCors(options =>
 {
