@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http.Json;
+using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 
 namespace HNG_Tasks.Controller
 {
@@ -9,12 +11,13 @@ namespace HNG_Tasks.Controller
         [HttpGet]
         public IActionResult GetInfo()
         {
-            return Ok(new
+            var response = new
             {
                 email = "yasiroyebo@gmail.com",
                 currentDateTime = DateTime.UtcNow.ToString("o"),
                 githubUrl = "https://github.com/YastecHub/HNG_Tasks"
-            });
+            };
+            return Ok(response);
         }
     }
 }
