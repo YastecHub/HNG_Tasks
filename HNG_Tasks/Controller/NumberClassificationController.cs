@@ -30,11 +30,11 @@ namespace HNG_Tasks.Controller
             var response = new NumberClassificationResponse
             {
                 Number = parsedNumber,
-                IsPrime = IsPrime(parsedNumber),
-                IsPerfect = IsPerfect(parsedNumber),
+                is_prime = IsPrime(parsedNumber),
+                is_perfect = IsPerfect(parsedNumber),
                 Properties = GetProperties(parsedNumber),
-                DigitSum = GetDigitSum(parsedNumber),
-                FunFact = await GetFunFact(parsedNumber)
+                digit_sum = GetDigitSum(parsedNumber),
+                fun_fact = await GetFunFact(parsedNumber)
             };
 
             return Ok(response);
