@@ -160,29 +160,30 @@ namespace HNG_Tasks.Controller
                 return BadRequest(new { error = true, number = numberQuery });
             }
 
-            var isPrimeTask = Task.Run(() => IsPrime(parsedNumber));
-            var isPerfectTask = Task.Run(() => IsPerfect(parsedNumber));
-            var isArmstrongTask = Task.Run(() => IsArmstrong(parsedNumber));
-            var digitSumTask = Task.Run(() => GetDigitSum(parsedNumber));
-            var funFactTask = GetFunFact(parsedNumber);
+            // Asynchronously fetch properties and fun fact
+            var isPrime = IsPrime(parsedNumber);
+            var isPerfect = IsPerfect(parsedNumber);
+            var isArmstrong = IsArmstrong(parsedNumber);
+            var digitSum = GetDigitSum(parsedNumber);
+            var funFact = await GetFunFact(parsedNumber);
 
-            await Task.WhenAll(isPrimeTask, isPerfectTask, isArmstrongTask, digitSumTask, funFactTask);
+            // Determine the number properties
+            var properties = new List<string> { parsedNumber % 2 == 0 ? "even" : "odd" };
+            if (isArmstrong) properties.Add("armstrong");
 
-            var properties = new List<string>();
-            if (isArmstrongTask.Result) properties.Add("armstrong");
-            properties.Add(parsedNumber % 2 == 0 ? "even" : "odd");
-
+            // Build and return the response
             return Ok(new NumberClassificationResponse
             {
                 Number = parsedNumber,
-                is_prime = isPrimeTask.Result,
-                is_perfect = isPerfectTask.Result,
+                is_prime = isPrime,
+                is_perfect = isPerfect,
                 Properties = properties,
-                digit_sum = digitSumTask.Result,
-                fun_fact = funFactTask.Result
+                digit_sum = digitSum,
+                fun_fact = funFact
             });
         }
 
+        // Determine if the number is prime
         private bool IsPrime(int number)
         {
             if (number < 2) return false;
@@ -197,6 +198,7 @@ namespace HNG_Tasks.Controller
             return true;
         }
 
+        // Determine if the number is a perfect number
         private bool IsPerfect(int number)
         {
             if (number < 1) return false;
@@ -212,22 +214,25 @@ namespace HNG_Tasks.Controller
             return sum == number && number != 1;
         }
 
+        // Determine if the number is an Armstrong number
         private bool IsArmstrong(int number)
         {
-            if (number < 0) return false;
-
-            int sum = 0, temp = number, digits = number.ToString().Length;
+            int positiveNumber = Math.Abs(number); // Ensure the number is positive
+            int sum = 0, temp = positiveNumber, digits = positiveNumber.ToString().Length;
             while (temp != 0)
             {
                 int digit = temp % 10;
                 sum += (int)Math.Pow(digit, digits);
                 temp /= 10;
             }
-            return sum == number;
+            return sum == positiveNumber;
         }
 
+
+        // Calculate the sum of digits of the number
         private int GetDigitSum(int number) => Math.Abs(number).ToString().Sum(c => c - '0');
 
+        // Get a fun fact about the number from an external API or cache
         private async Task<string> GetFunFact(int number)
         {
             if (_funFactCache.TryGetValue(number, out string cachedFact))
@@ -238,8 +243,9 @@ namespace HNG_Tasks.Controller
             var client = _httpClientFactory.CreateClient();
             string fact = await client.GetStringAsync($"http://numbersapi.com/{number}/math");
 
-            _funFactCache[number] = fact; // Cache response
+            _funFactCache[number] = fact; // Cache the fact for future use
             return fact;
         }
     }
 }
+
