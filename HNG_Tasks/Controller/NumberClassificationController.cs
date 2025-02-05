@@ -1,6 +1,5 @@
 ﻿using HNG_Tasks.Responses;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 
 namespace HNG_Tasks.Controller
 {
@@ -18,6 +17,14 @@ namespace HNG_Tasks.Controller
         [HttpGet("classify-number")]
         public async Task<IActionResult> ClassifyNumber([FromQuery] string number)
         {
+            if (string.IsNullOrEmpty(number))
+            {
+                return BadRequest(new
+                {
+                    error = true,
+                    message = "Number is required"
+                });
+            }
             if (!int.TryParse(number, out int parsedNumber))
             {
                 return BadRequest(new
@@ -90,6 +97,10 @@ namespace HNG_Tasks.Controller
 
         private bool IsArmstrong(int number)
         {
+            if (number < 0)
+            {
+                return false;
+            }
             int sum = 0;
             int temp = number;
             int digits = number.ToString().Length;
@@ -105,7 +116,7 @@ namespace HNG_Tasks.Controller
 
         private int GetDigitSum(int number)
         {
-            return number.ToString().Sum(c => c - '0');
+            return Math.Abs(number).ToString().Sum(c => c - '0');
         }
 
         private async Task<string> GetFunFact(int number)
